@@ -2,12 +2,19 @@ package hello.domain;
 
 import hello.web.TodosController;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Todo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String title;
     private String description;
-
-    private static Integer nextId = 1;
 
     public Todo(){}; //for Jackson
 
@@ -16,7 +23,6 @@ public class Todo {
     }
 
     public Todo(String title, String description){
-        id = nextId++;
         this.title = title;
         this.description = description;
     }

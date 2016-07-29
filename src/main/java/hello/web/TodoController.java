@@ -1,23 +1,25 @@
 package hello.web;
 
+import hello.dao.TodoDao;
 import hello.domain.InMemoryDatabase;
 import hello.domain.Todo;
 import hello.utils.JsonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(value="/todo")
 public class TodoController {
 
-    private InMemoryDatabase inMemoryDatabase;
+    @Autowired
+    TodoDao todoDao;
 
-    public TodoController(){
-        inMemoryDatabase = InMemoryDatabase.getInstance();
-    }
+    public TodoController(){}
 
-    @RequestMapping(value = "/todo/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> getTodoById(@PathVariable(value="id") Integer id) {
-        Todo todo = inMemoryDatabase.getById(id);
+        Todo todo = todoDao.findOne(id);
         if (todo == null){
             return ResponseEntity.ok(null);
         } else {
@@ -26,13 +28,13 @@ public class TodoController {
 
     }
 
-    @RequestMapping(value = "todo/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteTodoById(@PathVariable(value="id") Integer id){
-        Todo todo = inMemoryDatabase.getById(id);
+        Todo todo = todoDao.findOne(id);
         if (todo == null){
             return ResponseEntity.badRequest().body("Todo does not exists");
         }
-        inMemoryDatabase.remove(todo);
+        todoDao.delete(todo);
         return ResponseEntity.badRequest().body("Todo was successfully deleted");
     }
 
