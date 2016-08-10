@@ -5,6 +5,7 @@ import hello.domain.Todo;
 import hello.domain.TodoDto;
 import hello.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,16 +24,21 @@ public class TodosController {
 
     public TodosController(){}
 
+    public TodosController(TodoDao dao){
+        this.todoDao = dao;
+    }
+
     @RequestMapping(value="/todo", method=RequestMethod.GET)
     public ResponseEntity<String> getTodos(){
-        Iterator<Todo> iterator = todoDao.findAll().iterator();
-        List<Todo> allTodos = new ArrayList<>();
-        iterator.forEachRemaining((todo)-> allTodos.add(todo));
+        List<Todo> allTodos = (List<Todo>) todoDao.findAll();
         return ResponseEntity.ok(JsonUtils.toJson(allTodos));
     }
 
     @RequestMapping(value="/todo", method=RequestMethod.POST)
     public ResponseEntity<String> saveTodo(@RequestBody TodoDto dto){
+        if (!dto.isValid()){
+            return new ResponseEntity<String>("new todo should have both a title and a description", HttpStatus.BAD_REQUEST);
+        }
         Todo newTodo = new Todo(dto);
         Todo savedTodo = todoDao.save(newTodo);
         return ResponseEntity.ok(JsonUtils.toJson(savedTodo));
