@@ -17,11 +17,16 @@ public class TodoController {
 
     public TodoController(){}
 
+    public TodoController(TodoDao todoDao){
+        this.todoDao = todoDao;
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> getTodoById(@PathVariable(value="id") Integer id) {
+        System.out.println(id);
         Todo todo = todoDao.findOne(id);
         if (todo == null){
-            return ResponseEntity.ok(null);
+            return ResponseEntity.badRequest().body(String.format("No todo found with id %s", id));
         } else {
             return ResponseEntity.ok(JsonUtils.toJson(todo));
         }
@@ -30,12 +35,8 @@ public class TodoController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteTodoById(@PathVariable(value="id") Integer id){
-        Todo todo = todoDao.findOne(id);
-        if (todo == null){
-            return ResponseEntity.badRequest().body("Todo does not exists");
-        }
-        todoDao.delete(todo);
-        return ResponseEntity.badRequest().body("Todo was successfully deleted");
+        todoDao.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
