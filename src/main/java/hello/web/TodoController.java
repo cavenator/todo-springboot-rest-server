@@ -7,6 +7,7 @@ import hello.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value="/todo")
@@ -23,14 +24,9 @@ public class TodoController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> getTodoById(@PathVariable(value="id") Integer id) {
-        System.out.println(id);
-        Todo todo = todoDao.findOne(id);
-        if (todo == null){
-            return ResponseEntity.badRequest().body(String.format("No todo found with id %s", id));
-        } else {
-            return ResponseEntity.ok(JsonUtils.toJson(todo));
-        }
-
+        Optional<Todo> maybeTodo = Optional.ofNullable(todoDao.findOne(id));
+        ResponseEntity<String> badRequest = ResponseEntity.badRequest().body(String.format("No todo found with id %s", id));
+        return maybeTodo.flatMap( todo -> Optional.of(ResponseEntity.ok(JsonUtils.toJson(todo)))).orElse(badRequest);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

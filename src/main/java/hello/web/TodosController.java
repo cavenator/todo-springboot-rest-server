@@ -39,8 +39,7 @@ public class TodosController {
         if (!dto.isValid()){
             return new ResponseEntity<String>("new todo should have both a title and a description", HttpStatus.BAD_REQUEST);
         }
-        Todo newTodo = new Todo(dto);
-        Todo savedTodo = todoDao.save(newTodo);
+        Todo savedTodo = todoDao.save(new Todo(dto));
         return ResponseEntity.ok(JsonUtils.toJson(savedTodo));
     }
 

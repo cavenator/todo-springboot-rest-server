@@ -75,4 +75,11 @@ public class TodoControllerTest {
         response.andExpect(status().isNoContent());
     }
 
+    @Test
+    public void testComputeIfPresent() throws Exception {
+       Map<String, Integer> map = new HashMap();
+       map.put("a", 2);
+       map.computeIfPresent("a", (key,val) -> val+4);
+       Assert.assertTrue(map.get("a") == 6);
+    }
 }
